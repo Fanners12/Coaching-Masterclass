@@ -1,6 +1,6 @@
 {
-  "name": "A&G Coaching Masterclass",
-  "short_name": "A&G Coaching",
+  "name": "AG Coaching Masterclass",
+  "short_name": "AG Coaching",
   "description": "Top Training, For all Levels",
   "start_url": "./index.html",
   "display": "standalone",
