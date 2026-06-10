@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AG Coaching Masterclass">
+<meta name="theme-color" content="#0a0a0f">
+<title>AG Coaching Masterclass</title>
+
+<!-- PWA Manifest (inline base64) -->
+<link rel="manifest" href="./ag-manifest.json">
+
+<!-- Apple touch icon (SVG as base64 PNG fallback) -->
+<link rel="apple-touch-icon" href="./ag-icon-192.png">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0f;color:#f0f0f0;min-height:100vh;overscroll-behavior:none}
+  :root{--accent:#e8ff3c;--accent2:#ff4d4d;--surface:#13131a;--surface2:#1c1c26;--surface3:#24242f;--border:#2a2a38;--text:#f0f0f0;--muted:#8888a0}
+  .app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+  .topbar{background:#0a0a0f;border-bottom:1px solid var(--border);padding:0 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;height:56px;padding-top:env(safe-area-inset-top)}
+  .logo-wrap{flex:1;min-width:0}
+  .logo{font-size:15px;font-weight:800;letter-spacing:-0.3px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .logo span{color:var(--text)}
+  .logo-sub{font-size:10px;color:var(--muted);letter-spacing:0.3px;margin-top:1px}
+  .squad-badge{background:var(--surface3);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--muted);white-space:nowrap;flex-shrink:0}
+  .nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;border:none;background:transparent;color:var(--muted);font-size:10px;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;min-width:56px}
+  .nav-btn i{font-size:20px}
+  .nav-btn.active{color:var(--accent)}
+  .content{flex:1;overflow-y:auto;padding:16px;padding-bottom:24px;-webkit-overflow-scrolling:touch}
+  .section-title{font-size:22px;font-weight:700;margin-bottom:4px}
+  .section-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+  .card-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .player-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(min-width:500px){.player-grid{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:700px){.player-grid{grid-template-columns:repeat(4,1fr)}}
+  .coach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(min-width:600px){.coach-grid{grid-template-columns:repeat(3,1fr)}}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;cursor:pointer;transition:all 0.15s;font-family:inherit}
+  .btn:active{transform:scale(0.97)}
+  .btn-accent{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+  .btn-danger{background:rgba(255,77,77,0.12);color:#ff4d4d;border-color:rgba(255,77,77,0.3)}
+  .btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+  .btn-full{width:100%;justify-content:center}
+  .input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;outline:none;font-family:inherit;-webkit-appearance:none}
+  .input:focus{border-color:var(--accent)}
+  .select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;outline:none;cursor:pointer;font-family:inherit;-webkit-appearance:none}
+  .textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;outline:none;resize:vertical;min-height:80px;font-family:inherit;-webkit-appearance:none}
+  .textarea:focus,.input:focus,.select:focus{border-color:var(--accent)}
+  .player-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+  .player-card.selected{border-color:var(--accent);background:var(--surface2)}
+  .player-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+  .pc-fwd::before{background:var(--accent2)}
+  .pc-mid::before{background:#4d9fff}
+  .pc-def::before{background:#3dff8f}
+  .pc-gk::before{background:#ff9f4d}
+  .coach-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+  .coach-card.selected{border-color:var(--accent);background:var(--surface2)}
+  .coach-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#a855f7}
+  .avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;margin-bottom:8px}
+  .av-fwd{background:rgba(232,255,60,0.15);color:var(--accent)}
+  .av-mid{background:rgba(77,159,255,0.15);color:#4d9fff}
+  .av-def{background:rgba(61,255,143,0.15);color:#3dff8f}
+  .av-gk{background:rgba(255,159,77,0.15);color:#ff9f4d}
+  .av-coach{background:rgba(168,85,247,0.15);color:#a855f7}
+  .player-name{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .player-pos{font-size:11px;color:var(--muted)}
+  .stat-row{display:flex;align-items:center;gap:5px;margin-top:7px;flex-wrap:wrap}
+  .stat-pill{background:var(--surface3);border-radius:20px;padding:2px 7px;font-size:10px;color:var(--muted)}
+  .stat-pill.hl{background:rgba(232,255,60,0.12);color:var(--accent)}
+  .drill-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+  .drill-num{width:30px;height:30px;background:var(--accent);color:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+  .drill-info{flex:1;min-width:0}
+  .drill-name{font-size:14px;font-weight:600;margin-bottom:2px}
+  .drill-meta{font-size:11px;color:var(--muted)}
+  .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;margin-right:3px;margin-top:4px}
+  .tag-tech{background:rgba(77,159,255,0.15);color:#4d9fff}
+  .tag-phys{background:rgba(232,255,60,0.15);color:var(--accent)}
+  .tag-tact{background:rgba(77,255,180,0.15);color:#4dffc0}
+  .tag-press{background:rgba(255,77,77,0.15);color:#ff4d4d}
+  .timer-display{font-size:72px;font-weight:800;color:var(--accent);text-align:center;letter-spacing:-3px;font-variant-numeric:tabular-nums;line-height:1}
+  .timer-phase{font-size:18px;font-weight:600;text-align:center;margin-bottom:8px}
+  .timer-next{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+  .progress-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-top:12px}
+  .progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.5s}
+  .timer-box{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:24px 16px;text-align:center;margin-bottom:16px}
+  .timer-btns{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .drill-queue{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .dq-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:13px}
+  .dq-item.active{background:rgba(232,255,60,0.06);border-left:3px solid var(--accent)}
+  .dq-item:last-child{border-bottom:none}
+  .dq-time{color:var(--muted);font-size:11px;min-width:30px}
+  .ai-bubble{background:var(--surface2);border:1px solid var(--border);border-radius:12px;border-top-left-radius:4px;padding:12px 14px;margin-bottom:10px;font-size:14px;line-height:1.65}
+  .ai-bubble.user{background:rgba(232,255,60,0.06);border-color:rgba(232,255,60,0.2);border-radius:12px;border-top-right-radius:4px;margin-left:24px;font-size:13px}
+  .ai-label{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+  .loading-dots::after{content:'...';animation:dots 1.2s steps(4,end) infinite}
+  @keyframes dots{0%,100%{content:'.'}33%{content:'..'}66%{content:'...'}}
+  .tab-pills{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tab-pill{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit}
+  .tab-pill.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+  .metric-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+  .metric-row:last-child{border-bottom:none}
+  .metric-label{font-size:13px;color:var(--muted)}
+  .metric-val{font-size:13px;font-weight:600;text-align:right;max-width:55%}
+  .snapshot-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .snapshot-row:last-child{border-bottom:none}
+  .snapshot-date{font-size:11px;color:var(--muted);min-width:80px;padding-top:2px}
+  .snapshot-note{font-size:13px;flex:1}
+  .score-badge{background:rgba(232,255,60,0.12);color:var(--accent);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600;flex-shrink:0}
+  .form-row{margin-bottom:12px}
+  .form-label{font-size:12px;color:var(--muted);margin-bottom:5px;display:block}
+  .empty-state{text-align:center;padding:32px 20px;color:var(--muted)}
+  .empty-state i{font-size:36px;margin-bottom:10px;display:block;color:var(--accent)}
+  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+  .note-add-row{display:flex;gap:8px;align-items:flex-start;margin-top:8px}
+  .big-num{font-size:36px;font-weight:800;color:var(--accent)}
+  .section-toggle{display:flex;gap:8px;margin-bottom:16px}
+  .toggle-btn{flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit;text-align:center}
+  .toggle-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+  .add-row{display:flex;gap:8px;margin-bottom:12px}
+  .count-badge{background:var(--surface3);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--muted);margin-left:6px}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="logo-wrap">
+      <div class="logo">A+G <span>COACHING MASTERCLASS</span></div>
+      <div class="logo-sub">Top Training, For all Levels</div>
+    </div>
+    <div class="squad-badge" id="squad-badge">...</div>
+  </div>
+  <div class="nav" id="nav"></div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+const TABS=[
+  {id:'squad',label:'Squad',icon:'ti-users'},
+  {id:'coaches',label:'Coaches',icon:'ti-whistle'},
+  {id:'session',label:'Planner',icon:'ti-layout-board'},
+  {id:'live',label:'Live',icon:'ti-player-play'},
+  {id:'progress',label:'Progress',icon:'ti-chart-line'},
+  {id:'ai',label:'AI Coach',icon:'ti-brain'},
+];
+
+const POSITIONS=['Striker','Winger','Attacking Mid','Central Mid','Defensive Mid','Full Back','Centre Back','Goalkeeper'];
+const COACH_ROLES=['Head Coach','Assistant Coach','Goalkeeper Coach','Fitness Coach','Development Coach'];
+
+const DRILL_LIBRARY=[
+  // 1 player (solo)
+  {id:1,name:'Ball Mastery Circuit',duration:8,category:'Technical',tags:['tech'],minP:1,maxP:1,desc:'Cone grid: toe taps, inside/outside rolls, sole rolls. 30s on, 15s rest. Coach feeds verbal cues.'},
+  {id:2,name:'Solo Finishing Runs',duration:10,category:'Finishing',tags:['tech','phys'],minP:1,maxP:1,desc:'Player makes 6 different runs from outside the box, receives from coach and finishes. Alternate feet.'},
+  {id:3,name:'First Touch & Turn',duration:8,category:'Technical',tags:['tech'],minP:1,maxP:1,desc:'Coach serves balls in the air and on the ground. Player controls, turns and plays back. 3 series of 8.'},
+  {id:4,name:'Sprint & Shoot',duration:10,category:'Physical',tags:['phys','tech'],minP:1,maxP:1,desc:'Player sprints 20m to receive, takes one touch and shoots. 8 reps each side. Focus on shape after exertion.'},
+  {id:5,name:'Weak Foot Development',duration:10,category:'Technical',tags:['tech'],minP:1,maxP:1,desc:'All passing and shooting with the weaker foot only. Varied distances from 5m to 18m. Coach records accuracy.'},
+  // 2 players
+  {id:6,name:'1v1 Duel',duration:10,category:'1v1',tags:['tech','phys'],minP:2,maxP:2,desc:'Attacker vs defender in a 10x10 zone. Attacker scores on mini goal, defender clears. 90s bouts, swap roles.'},
+  {id:7,name:'Passing & Movement Pairs',duration:8,category:'Technical',tags:['tech','tact'],minP:2,maxP:2,desc:'10 passes then a run in behind. Vary distance from 10–25m. Progress to one-touch after 3 sets.'},
+  {id:8,name:'Wall Pass & Finish',duration:10,category:'Combination',tags:['tech','tact'],minP:2,maxP:2,desc:'Player A plays to B, overlaps, receives the return and finishes. 5 reps each, both sides of the pitch.'},
+  {id:9,name:'2v0 Pattern Reps',duration:8,category:'Technical',tags:['tech','tact'],minP:2,maxP:2,desc:'Unopposed passing pattern: inside pass → switch → overlap → cross. Drill perfect movement, no pressure.'},
+  {id:10,name:'Keeper vs Striker',duration:12,category:'Finishing',tags:['tech','phys'],minP:2,maxP:2,desc:'Striker gets 10 chances from varied angles. Keeper responds and distributes. Rotate after each set.'},
+  // 3 players
+  {id:11,name:'2v1 Overload',duration:10,category:'Tactical',tags:['tact','tech'],minP:3,maxP:3,desc:'2 attackers vs 1 defender in a 15x10 zone. Attackers must score within 4 passes. Defender rotates every 2 mins.'},
+  {id:12,name:'Triangle Passing',duration:8,category:'Technical',tags:['tech','tact'],minP:3,maxP:3,desc:'3-cone triangle, 10m sides. One-touch passing, rotate clockwise then anti-clockwise. Progress to movement after pass.'},
+  {id:13,name:'Third Man Runs',duration:12,category:'Combination',tags:['tech','tact'],minP:3,maxP:3,desc:'A plays to B, B plays to C who has made a run in behind. Rotate positions every 4 mins. Both channels.'},
+  {id:14,name:'Press & Recover 2v1',duration:10,category:'Tactical',tags:['tact','press'],minP:3,maxP:3,desc:'2 defenders press 1 attacker. Attacker tries to beat the press and reach end zone. 6 reps, swap roles.'},
+  {id:15,name:'3-Goal Game',duration:12,category:'Match',tags:['tact','phys'],minP:3,maxP:3,desc:'1v1 with a neutral player supporting the attacker. 3 mini goals. Neutral always joins attacking team.'},
+  // 4 players
+  {id:16,name:'Rondo 3v1',duration:10,category:'Technical',tags:['tech','tact'],minP:4,maxP:4,desc:'3 keep possession vs 1 presser in a 10x10 grid. Presser swaps on every turnover. Focus on angles of support.'},
+  {id:17,name:'4-Corner Possession',duration:10,category:'Technical',tags:['tech','tact'],minP:4,maxP:4,desc:'4 players on corners of a 12m square. Free passing, player follows pass. Progress to one-touch.'},
+  {id:18,name:'2v2 Transition Game',duration:15,category:'Match',tags:['tact','phys'],minP:4,maxP:4,desc:'2v2 in a 20x15 zone with 4 mini goals. On turnover, defending team attacks immediately. High intensity.'},
+  {id:19,name:'Combination Play: Overlap',duration:10,category:'Combination',tags:['tech','tact'],minP:4,maxP:4,desc:'Wall pass → overlap → cutback to late runner. 4 roles, rotate every 3 mins. Coach adds defender at stage 2.'},
+  {id:20,name:'Pressing Triggers',duration:12,category:'Tactical',tags:['tact','press'],minP:4,maxP:5,desc:'Coach plays into a target; team presses as a unit on a cue word. 6 reps, 45s rest. Focus on compactness.'},
+  // 5–6 players
+  {id:21,name:'Rondo 4v1',duration:10,category:'Technical',tags:['tech','tact'],minP:5,maxP:6,desc:'4 keep vs 1 presser. Swap presser on every turnover or after 30s. Add second presser once fluent.'},
+  {id:22,name:'4v2 Possession Box',duration:12,category:'Technical',tags:['tech','tact'],minP:6,maxP:6,desc:'4 keep vs 2 in a 12x12 grid. 5-pass target before switching. Develop short-long combinations.'},
+  {id:23,name:'3v2 Attack vs Defence',duration:12,category:'Tactical',tags:['tact','phys'],minP:5,maxP:6,desc:'3 attackers vs 2 defenders plus goalkeeper. Score within 6 passes. Defenders press immediately on turnover.'},
+  {id:24,name:'Switch Play Pattern',duration:10,category:'Tactical',tags:['tact','tech'],minP:5,maxP:6,desc:'Build from back through midfield and switch to wide player. Staged: 5 roles, rotate every 4 mins.'},
+  {id:25,name:'Transition 3v3',duration:15,category:'Match',tags:['tact','phys'],minP:6,maxP:6,desc:'3v3 in a 25x20 zone. On turnover, both teams reorganise and play back the other way within 3 seconds.'},
+  // 7–9 players
+  {id:26,name:'5v2 Rondo',duration:10,category:'Technical',tags:['tech','tact'],minP:7,maxP:9,desc:'5 keep vs 2 pressers in a 15x15 grid. Pressers swap on turnover. Focus on movement to create angles.'},
+  {id:27,name:'4v3 Plus Keeper',duration:15,category:'Tactical',tags:['tact','phys'],minP:8,maxP:9,desc:'4 attackers vs 3 defenders plus keeper in a half pitch. Attackers must complete 4 passes before shooting.'},
+  {id:28,name:'Shadow Play 7-a-side Shape',duration:12,category:'Tactical',tags:['tact'],minP:7,maxP:9,desc:'Unopposed positional shape movement. Coach calls phases: build up, press high, wide overload. No opposition.'},
+  {id:29,name:'5v4 Overload Game',duration:15,category:'Match',tags:['tact','phys'],minP:9,maxP:9,desc:'5 vs 4 in half pitch. Overloaded team must score in 8 passes. Underloaded team scores on counter only.'},
+  {id:30,name:'Wide Play Pattern',duration:10,category:'Combination',tags:['tact','tech'],minP:7,maxP:9,desc:'Full width passing pattern: GK → CB → wide → CM → striker lay-off → CM shoot. Drill both sides.'},
+  // 10–11 players
+  {id:31,name:'9v2 Possession',duration:10,category:'Technical',tags:['tech','tact'],minP:10,maxP:11,desc:'9 keep vs 2 pressers across half pitch. Target: 10 consecutive passes. Focus on rhythm and scanning.'},
+  {id:32,name:'Full Team Shape: Attacking',duration:15,category:'Tactical',tags:['tact'],minP:10,maxP:11,desc:'Attacking phase from goalkeeper to final third. Coach pauses and adjusts positions. Both wide channels.'},
+  {id:33,name:'Full Team Shape: Defensive',duration:15,category:'Tactical',tags:['tact','press'],minP:10,maxP:11,desc:'Defensive block and pressing triggers across full pitch. Set piece defensive positions included.'},
+  {id:34,name:'8v3 Possession to Goal',duration:15,category:'Match',tags:['tact','phys'],minP:11,maxP:11,desc:'8 attackers progress through 3 defenders to shoot. Defenders press on second phase. 3 series.'},
+  {id:35,name:'11-a-side Pattern Play',duration:20,category:'Match',tags:['tact','phys'],minP:11,maxP:11,desc:'Full team attacking and defensive patterns across the full pitch. Rotate positions after each sequence.'},
+  // Universal (any group size)
+  {id:36,name:'Sprint & Recover',duration:6,category:'Physical',tags:['phys'],minP:1,maxP:11,desc:'30m sprint, jog back. 6 reps. Simulates transition runs. Scale cones to pitch size.'},
+  {id:37,name:'Agility Ladder Circuit',duration:8,category:'Physical',tags:['phys'],minP:1,maxP:11,desc:'In-out, icky shuffle, lateral single step. 3 runs each. Coach times; players compete vs personal best.'},
+  {id:38,name:'Shooting Circuit',duration:12,category:'Finishing',tags:['tech','phys'],minP:1,maxP:11,desc:'6 cones at different angles around box. Player shoots from each in turn. Coach tracks accuracy per session.'},
+  {id:39,name:'Decision Making Grid',duration:10,category:'Tactical',tags:['tact','tech'],minP:3,maxP:11,desc:'Coach calls colour or number — players combine and move to the correct zone. Scale grid to group size.'},
+  {id:40,name:'Possession Under Pressure',duration:12,category:'Technical',tags:['tech','press'],minP:4,maxP:11,desc:'5-pass rule in grid with 1 presser. Upgrade to 2 pressers as quality improves. Grid size scales to group.'},
+];
+
+const posClass=p=>{if(!p)return'fwd';const l=p.toLowerCase();if(l.includes('striker')||l.includes('winger')||l.includes('attacking'))return'fwd';if(l.includes('mid'))return'mid';if(l.includes('back')||l.includes('centre b'))return'def';if(l.includes('goal'))return'gk';return'fwd';};
+const initials=name=>name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+const nextId=arr=>arr.length>0?Math.max(...arr.map(x=>x.id))+1:1;
+
+const DEFAULT_PLAYERS=[
+  {id:1,name:'Player 1',pos:'Striker',age:25,goals:'Pace and finishing',notes:'',sessions:0},
+  {id:2,name:'Player 2',pos:'Central Mid',age:25,goals:'Press and pass quality',notes:'',sessions:0},
+  {id:3,name:'Player 3',pos:'Centre Back',age:25,goals:'Distribution',notes:'',sessions:0},
+  {id:4,name:'Player 4',pos:'Winger',age:25,goals:'Dribbling and crossing',notes:'',sessions:0},
+];
+const DEFAULT_COACHES=[
+  {id:1,name:'Coach 1',role:'Head Coach',age:35,notes:''},
+];
+
+let state={
+  tab:'squad',
+  players:DEFAULT_PLAYERS.map(p=>({...p})),
+  coaches:DEFAULT_COACHES.map(c=>({...c})),
+  session:{name:'Session 1',drills:[1,3,5],warmup:'Dynamic warm-up 5 mins',cooldown:'Stretch and cool-down 5 mins'},
+  progress:{},
+  selectedPlayer:1,
+  selectedCoach:1,
+  progressPlayer:1,
+  squadView:'players',
+  aiMessages:[],
+  aiTarget:'player',
+  sessionFilter:'All',
+  liveTimer:{running:false,seconds:0,drillIdx:0},
+};
+
+let timerInterval=null;
+
+function save(){try{localStorage.setItem('fec1',JSON.stringify({players:state.players,coaches:state.coaches,session:state.session,progress:state.progress}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('fec1')||'null');if(d){if(d.players)state.players=d.players;if(d.coaches)state.coaches=d.coaches;if(d.session)state.session=d.session;if(d.progress)state.progress=d.progress;}}catch(e){}}
+load();
+
+// ensure all players have progress entries
+state.players.forEach(p=>{if(!state.progress[p.id])state.progress[p.id]=[];});
+
+function updateBadge(){
+  const nc=state.coaches.length,np=state.players.length;
+  document.getElementById('squad-badge').innerHTML=`<i class="ti ti-whistle" style="font-size:10px"></i> ${nc} Coach${nc!==1?'es':''} · <i class="ti ti-user" style="font-size:10px"></i> ${np} Player${np!==1?'s':''}`;
+}
+
+function render(){
+  document.getElementById('nav').innerHTML=TABS.map(t=>`<button class="nav-btn${state.tab===t.id?' active':''}" onclick="setTab('${t.id}')"><i class="ti ${t.icon}"></i>${t.label}</button>`).join('');
+  const c=document.getElementById('content');
+  const views={squad:renderSquad,coaches:renderCoaches,session:renderSession,live:renderLive,progress:renderProgress,ai:renderAI};
+  c.innerHTML=(views[state.tab]||renderSquad)();
+  attachHandlers();
+  updateBadge();
+}
+
+function setTab(t){state.tab=t;render();}
+
+/* ===== SQUAD ===== */
+function renderSquad(){
+  const sel=state.players.find(x=>x.id===state.selectedPlayer)||state.players[0];
+  const canAdd=state.players.length<11;
+  const canRemove=state.players.length>1;
+  return`<div class="section-title">Squad <span class="count-badge">${state.players.length}/11 players</span></div>
+  <div class="section-sub">Tap a player to edit · Add up to 11 players</div>
+  <div class="add-row">
+    ${canAdd?`<button class="btn btn-accent btn-sm" onclick="addPlayer()"><i class="ti ti-plus"></i>Add Player</button>`:'<span style="font-size:12px;color:var(--muted);padding:8px 0">Squad full (11 players)</span>'}
+  </div>
+  <div class="player-grid" style="margin-bottom:16px">
+    ${state.players.map(pl=>{const pc=posClass(pl.pos);return`<div class="player-card pc-${pc}${state.selectedPlayer===pl.id?' selected':''}" onclick="selPlayer(${pl.id})">
+      <div class="avatar av-${pc}">${initials(pl.name)}</div>
+      <div class="player-name">${pl.name}</div>
+      <div class="player-pos">${pl.pos}</div>
+      <div class="stat-row"><span class="stat-pill hl">${pl.sessions} sessions</span></div>
+    </div>`;}).join('')}
+  </div>
+  ${sel?`<div class="card">
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">Edit — ${sel.name} ${canRemove?`<button class="btn btn-danger btn-sm" onclick="removePlayer(${sel.id})" style="padding:7px 12px"><i class="ti ti-trash"></i> Remove</button>`:''}</div>
+    <div class="form-row"><label class="form-label">Name</label><input class="input" id="e-name" value="${sel.name}"></div>
+    <div class="grid2">
+      <div class="form-row"><label class="form-label">Position</label><select class="select" id="e-pos">${POSITIONS.map(p=>`<option${p===sel.pos?' selected':''}>${p}</option>`).join('')}</select></div>
+      <div class="form-row"><label class="form-label">Age</label><input class="input" id="e-age" type="number" value="${sel.age}" min="5" max="70"></div>
+    </div>
+    <div class="form-row"><label class="form-label">Training Goal</label><input class="input" id="e-goals" value="${sel.goals||''}"></div>
+    <div class="form-row"><label class="form-label">Coaching Notes</label><textarea class="textarea" id="e-notes">${sel.notes||''}</textarea></div>
+    <button class="btn btn-accent btn-full" onclick="savePlayer()"><i class="ti ti-check"></i>Save Player</button>
+  </div>`:''}`;
+}
+
+function selPlayer(id){state.selectedPlayer=id;render();}
+function addPlayer(){
+  if(state.players.length>=11)return;
+  const id=nextId(state.players);
+  state.players.push({id,name:'New Player',pos:'Striker',age:20,goals:'',notes:'',sessions:0});
+  state.progress[id]=[];
+  state.selectedPlayer=id;
+  save();render();
+}
+function removePlayer(id){
+  if(state.players.length<=1){alert('You need at least 1 player.');return;}
+  state.players=state.players.filter(p=>p.id!==id);
+  delete state.progress[id];
+  state.selectedPlayer=state.players[0]?.id||null;
+  save();render();
+}
+function savePlayer(){
+  const p=state.players.find(x=>x.id===state.selectedPlayer);if(!p)return;
+  p.name=document.getElementById('e-name').value||p.name;
+  p.pos=document.getElementById('e-pos').value;
+  p.age=parseInt(document.getElementById('e-age').value)||p.age;
+  p.goals=document.getElementById('e-goals').value;
+  p.notes=document.getElementById('e-notes').value;
+  save();render();
+}
+
+/* ===== COACHES ===== */
+function renderCoaches(){
+  const sel=state.coaches.find(x=>x.id===state.selectedCoach)||state.coaches[0];
+  const canAdd=state.coaches.length<5;
+  const canRemove=state.coaches.length>1;
+  return`<div class="section-title">Coaches <span class="count-badge">${state.coaches.length}/5 coaches</span></div>
+  <div class="section-sub">Tap a coach to edit · Add up to 5 coaches</div>
+  <div class="add-row">
+    ${canAdd?`<button class="btn btn-accent btn-sm" onclick="addCoach()"><i class="ti ti-plus"></i>Add Coach</button>`:'<span style="font-size:12px;color:var(--muted);padding:8px 0">Maximum coaches reached (5)</span>'}
+  </div>
+  <div class="coach-grid" style="margin-bottom:16px">
+    ${state.coaches.map(c=>`<div class="coach-card${state.selectedCoach===c.id?' selected':''}" onclick="selCoach(${c.id})">
+      <div class="avatar av-coach">${initials(c.name)}</div>
+      <div class="player-name">${c.name}</div>
+      <div class="player-pos">${c.role}</div>
+    </div>`).join('')}
+  </div>
+  ${sel?`<div class="card">
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">Edit — ${sel.name} ${canRemove?`<button class="btn btn-danger btn-sm" onclick="removeCoach(${sel.id})" style="padding:7px 12px"><i class="ti ti-trash"></i> Remove</button>`:''}</div>
+    <div class="form-row"><label class="form-label">Name</label><input class="input" id="c-name" value="${sel.name}"></div>
+    <div class="form-row"><label class="form-label">Role</label><select class="select" id="c-role">${COACH_ROLES.map(r=>`<option${r===sel.role?' selected':''}>${r}</option>`).join('')}</select></div>
+    <div class="form-row"><label class="form-label">Age</label><input class="input" id="c-age" type="number" value="${sel.age||''}" min="16" max="80"></div>
+    <div class="form-row"><label class="form-label">Notes</label><textarea class="textarea" id="c-notes">${sel.notes||''}</textarea></div>
+    <button class="btn btn-accent btn-full" onclick="saveCoach()"><i class="ti ti-check"></i>Save Coach</button>
+  </div>`:''}`;
+}
+
+function selCoach(id){state.selectedCoach=id;render();}
+function addCoach(){
+  if(state.coaches.length>=5)return;
+  const id=nextId(state.coaches);
+  state.coaches.push({id,name:'New Coach',role:'Assistant Coach',age:30,notes:''});
+  state.selectedCoach=id;
+  save();render();
+}
+function removeCoach(id){
+  if(state.coaches.length<=1){alert('You need at least 1 coach.');return;}
+  state.coaches=state.coaches.filter(c=>c.id!==id);
+  state.selectedCoach=state.coaches[0]?.id||null;
+  save();render();
+}
+function saveCoach(){
+  const c=state.coaches.find(x=>x.id===state.selectedCoach);if(!c)return;
+  c.name=document.getElementById('c-name').value||c.name;
+  c.role=document.getElementById('c-role').value;
+  c.age=parseInt(document.getElementById('c-age').value)||c.age;
+  c.notes=document.getElementById('c-notes').value;
+  save();render();
+}
+
+/* ===== SESSION PLANNER ===== */
+function renderSession(){
+  const drills=state.session.drills.map(id=>DRILL_LIBRARY.find(d=>d.id===id)).filter(Boolean);
+  const total=drills.reduce((a,d)=>a+d.duration,0)+10;
+  const tagMap={tech:'tag-tech',phys:'tag-phys',tact:'tag-tact',press:'tag-press'};
+  const np=state.players.length;
+  const available=DRILL_LIBRARY.filter(d=>!state.session.drills.includes(d.id)&&np>=d.minP&&np<=d.maxP);
+  const cats=[...new Set(available.map(d=>d.category))].sort();
+  const activeCat=state.sessionFilter||'All';
+  const filtered=activeCat==='All'?available:available.filter(d=>d.category===activeCat);
+  return`<div class="section-title">Session Planner</div>
+  <div class="section-sub">Build your session · ${np} player${np!==1?'s':''} · ${state.coaches.length} coach${state.coaches.length!==1?'es':''}</div>
+  <div class="card">
+    <div class="form-row"><label class="form-label">Session Name</label><input class="input" id="s-name" value="${state.session.name}" onchange="state.session.name=this.value;save()"></div>
+    <div class="form-row"><label class="form-label">Warm-up</label><input class="input" id="s-warmup" value="${state.session.warmup}" onchange="state.session.warmup=this.value;save()"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Drill Sequence <span style="color:var(--accent);float:right">${total} mins</span></div>
+    ${drills.length===0?`<div class="empty-state"><i class="ti ti-playlist-add"></i>No drills added yet</div>`:''}
+    ${drills.map((d,i)=>`<div class="drill-card">
+      <div class="drill-num">${i+1}</div>
+      <div class="drill-info">
+        <div class="drill-name">${d.name}</div>
+        <div class="drill-meta">${d.duration} mins · ${d.category} · ${d.minP===d.maxP?d.minP+' player'+(d.minP>1?'s':''):d.minP+'–'+d.maxP+' players'}</div>
+        <div>${d.tags.map(t=>`<span class="tag ${tagMap[t]||''}">${t}</span>`).join('')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:5px">${d.desc}</div>
+      </div>
+      <button class="btn btn-sm" onclick="removeDrill(${d.id})" style="flex-shrink:0;padding:6px 8px"><i class="ti ti-x"></i></button>
+    </div>`).join('')}
+    <div style="padding:8px 0;font-size:12px;color:var(--muted);font-style:italic">Cool-down: ${state.session.cooldown}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Add Drills <span style="color:var(--accent);font-weight:600;float:right">Filtered for ${np} player${np!==1?'s':''}</span></div>
+    <div class="tab-pills" style="margin-bottom:12px">
+      <button class="tab-pill${activeCat==='All'?' active':''}" onclick="setDrillFilter('All')">All</button>
+      ${cats.map(c=>`<button class="tab-pill${activeCat===c?' active':''}" onclick="setDrillFilter('${c}')">${c}</button>`).join('')}
+    </div>
+    ${filtered.length===0?`<div class="empty-state" style="padding:16px"><i class="ti ti-check"></i>All drills for this group size are in your session</div>`:''}
+    ${filtered.map(d=>`<div class="drill-card">
+      <div class="drill-num" style="background:var(--surface3);color:var(--muted)">${d.id}</div>
+      <div class="drill-info">
+        <div class="drill-name">${d.name}</div>
+        <div class="drill-meta">${d.duration} mins · ${d.category} · ${d.minP===d.maxP?d.minP+' player'+(d.minP>1?'s':''):d.minP+'–'+d.maxP+' players'}</div>
+        <div>${d.tags.map(t=>`<span class="tag ${tagMap[t]||''}">${t}</span>`).join('')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">${d.desc}</div>
+      </div>
+      <button class="btn btn-sm btn-accent" onclick="addDrill(${d.id})" style="flex-shrink:0"><i class="ti ti-plus"></i></button>
+    </div>`).join('')}
+  </div>`;
+}
+function addDrill(id){if(!state.session.drills.includes(id)){state.session.drills.push(id);save();render();}}
+function removeDrill(id){state.session.drills=state.session.drills.filter(x=>x!==id);save();render();}
+function setDrillFilter(cat){state.sessionFilter=cat;render();}
+
+/* ===== LIVE SESSION ===== */
+function renderLive(){
+  const drills=state.session.drills.map(id=>DRILL_LIBRARY.find(d=>d.id===id)).filter(Boolean);
+  const t=state.liveTimer;
+  const cur=drills[t.drillIdx];
+  const m=Math.floor(t.seconds/60),s=t.seconds%60;
+  const timeStr=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const pct=cur?Math.min(100,Math.round((t.seconds/(cur.duration*60))*100)):0;
+  return`<div class="section-title">Live Session</div>
+  <div class="section-sub">${state.session.name} · ${state.players.length} players · ${state.coaches.length} coach${state.coaches.length!==1?'es':''}</div>
+  <div class="timer-box">
+    <div class="timer-phase">${cur?cur.name:'Session Complete'}</div>
+    <div class="timer-display" id="timer-disp">${timeStr}</div>
+    <div class="timer-next">${drills[t.drillIdx+1]?'Next: '+drills[t.drillIdx+1].name:'Last drill'}</div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:${pct}%"></div></div>
+    <div class="timer-btns">
+      <button class="btn btn-accent" onclick="toggleTimer()" id="play-btn"><i class="ti ${t.running?'ti-player-pause':'ti-player-play'}"></i>${t.running?'Pause':'Start'}</button>
+      <button class="btn" onclick="nextDrill()"><i class="ti ti-skip-forward"></i>Next</button>
+      <button class="btn" onclick="resetTimer()"><i class="ti ti-refresh"></i>Reset</button>
+    </div>
+  </div>
+  <div class="drill-queue" style="margin-bottom:12px">
+    ${drills.map((d,i)=>`<div class="dq-item${i===t.drillIdx?' active':''}">
+      <span class="dq-time">${d.duration}m</span>
+      <span style="flex:1;font-weight:${i===t.drillIdx?700:400}">${d.name}</span>
+      <span style="font-size:11px;color:var(--muted)">${d.category}</span>
+    </div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">Log This Session</div>
+    <textarea class="textarea" id="session-note" placeholder="Session notes for all players..."></textarea>
+    <button class="btn btn-accent btn-full" style="margin-top:10px" onclick="logSession()"><i class="ti ti-check"></i>Save Session for All Players</button>
+  </div>`;
+}
+function toggleTimer(){
+  if(state.liveTimer.running){
+    clearInterval(timerInterval);timerInterval=null;
+    state.liveTimer.running=false;
+    const btn=document.getElementById('play-btn');
+    if(btn)btn.innerHTML='<i class="ti ti-player-play"></i>Start';
+  } else {
+    const drills=state.session.drills.map(id=>DRILL_LIBRARY.find(d=>d.id===id)).filter(Boolean);
+    state.liveTimer.running=true;
+    const btn=document.getElementById('play-btn');
+    if(btn)btn.innerHTML='<i class="ti ti-player-pause"></i>Pause';
+    timerInterval=setInterval(()=>{
+      state.liveTimer.seconds++;
+      const cur=drills[state.liveTimer.drillIdx];
+      if(cur&&state.liveTimer.seconds>=cur.duration*60){
+        if(state.liveTimer.drillIdx<drills.length-1){state.liveTimer.drillIdx++;state.liveTimer.seconds=0;render();return;}
+        else{clearInterval(timerInterval);timerInterval=null;state.liveTimer.running=false;render();return;}
+      }
+      const mm=Math.floor(state.liveTimer.seconds/60),ss=state.liveTimer.seconds%60;
+      const td=document.getElementById('timer-disp');
+      if(td)td.textContent=`${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+      const pf=document.getElementById('prog-fill');
+      const cur2=drills[state.liveTimer.drillIdx];
+      if(pf&&cur2)pf.style.width=Math.min(100,Math.round((state.liveTimer.seconds/(cur2.duration*60))*100))+'%';
+    },1000);
+  }
+}
+function nextDrill(){const drills=state.session.drills.map(id=>DRILL_LIBRARY.find(d=>d.id===id)).filter(Boolean);if(state.liveTimer.drillIdx<drills.length-1){state.liveTimer.drillIdx++;state.liveTimer.seconds=0;}render();}
+function resetTimer(){clearInterval(timerInterval);timerInterval=null;state.liveTimer={running:false,seconds:0,drillIdx:0};render();}
+function logSession(){
+  const note=document.getElementById('session-note')?.value||'Session completed.';
+  const today=new Date().toISOString().split('T')[0];
+  state.players.forEach(p=>{
+    if(!state.progress[p.id])state.progress[p.id]=[];
+    state.progress[p.id].push({date:today,note,score:3});
+    p.sessions++;
+  });
+  save();
+  alert(`Session logged for ${state.players.length} player${state.players.length!==1?'s':''}!`);
+  render();
+}
+
+/* ===== PROGRESS ===== */
+function renderProgress(){
+  const pid=state.progressPlayer;
+  const pl=state.players.find(x=>x.id===pid)||state.players[0];
+  if(!pl)return`<div class="section-title">Progress</div><div class="section-sub">No players yet</div>`;
+  if(state.progressPlayer!==pl.id)state.progressPlayer=pl.id;
+  const logs=state.progress[pl.id]||[];
+  const avg=logs.length?Math.round(logs.reduce((a,l)=>a+l.score,0)/logs.length*10)/10:0;
+  return`<div class="section-title">Progress</div>
+  <div class="section-sub">Track player improvement over time</div>
+  <div class="tab-pills">${state.players.map(p=>`<button class="tab-pill${p.id===state.progressPlayer?' active':''}" onclick="setProgPlayer(${p.id})">${p.name.split(' ')[0]}</button>`).join('')}</div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="card" style="margin-bottom:0;text-align:center"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">Sessions</div><div class="big-num">${pl.sessions}</div></div>
+    <div class="card" style="margin-bottom:0;text-align:center"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">Avg Rating</div><div class="big-num">${avg||'—'}</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">${pl.name} · ${pl.pos}</div>
+    <div class="metric-row"><span class="metric-label">Goal</span><span class="metric-val">${pl.goals||'Not set'}</span></div>
+    <div class="metric-row"><span class="metric-label">Notes</span><span class="metric-val">${pl.notes||'—'}</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Add Session Note</div>
+    <textarea class="textarea" id="manual-note" placeholder="Add a note..." style="min-height:60px"></textarea>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      ${[1,2,3,4,5].map(n=>`<button class="btn btn-sm" onclick="addNote(${pl.id},${n})" style="flex:1;justify-content:center">★${n}</button>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Session Log</div>
+    ${logs.length===0?`<div class="empty-state"><i class="ti ti-clipboard"></i>No sessions yet</div>`:logs.slice().reverse().map(l=>`<div class="snapshot-row">
+      <span class="snapshot-date">${l.date}</span>
+      <span class="snapshot-note">${l.note}</span>
+      <span class="score-badge">${'★'.repeat(l.score)}</span>
+    </div>`).join('')}
+  </div>`;
+}
+function setProgPlayer(id){state.progressPlayer=id;render();}
+function addNote(pid,score){
+  const note=document.getElementById('manual-note')?.value||'Session logged.';
+  if(!state.progress[pid])state.progress[pid]=[];
+  state.progress[pid].push({date:new Date().toISOString().split('T')[0],note,score});
+  const p=state.players.find(x=>x.id===pid);if(p)p.sessions++;
+  save();render();
+}
+
+/* ===== COACH ADVICE LIBRARY ===== */
+const COACH_ADVICE = {
+  gym:{
+    'Goalkeeper':`GYM PLAN - GOALKEEPER\n\n3 DAYS PER WEEK\n\nDay 1: Explosive Power\n• Trap bar deadlift 4x4\n• Box jumps 4x5\n• Lateral bounds 3x8 each side\n• Single leg Romanian deadlift 3x8\n• Hip thrust 3x10\n\nDay 2: Upper Body and Core\n• Pull-ups 4x6\n• Dumbbell bench press 3x8\n• Cable rows 3x10\n• Pallof press 3x12 each side\n• Dead bug 3x10\n• Plank variations 3x45s\n\nDay 3: Reactive and Speed\n• Resisted lateral shuffles 6x10m\n• Drop jumps 3x6\n• Medicine ball chest throw 3x8\n• Agility ladder 10 mins\n• Diving mechanics drill 3x5 each side\n\nKEY FOCUS: Goalkeepers need explosive power in all directions — not just vertical. Lateral bounds and single leg work are essential. Strong hips and core prevent the most common GK injuries.`,
+    'Centre Back':`GYM PLAN - CENTRE BACK\n\n3 DAYS PER WEEK\n\nDay 1: Strength\n• Back squat 4x5\n• Romanian deadlift 4x6\n• Hip thrust 3x10\n• Nordic hamstring curl 3x6\n• Calf raises 3x20\n\nDay 2: Upper Body and Aerial\n• Weighted pull-ups 3x6\n• Dumbbell rows 3x10\n• Overhead press 3x8\n• Neck strengthening exercises 3x15\n• Core circuit 3 rounds\n\nDay 3: Power and Speed\n• Trap bar deadlift 4x4\n• Broad jumps 3x6\n• Resisted sprints 6x20m\n• Agility work 10 mins\n• Single leg exercises 3x10 each\n\nKEY FOCUS: Posterior chain strength for aerial dominance and tackling power. Neck and upper body for heading. Sprint speed for recovery runs.`,
+    'Full Back':`GYM PLAN - FULL BACK\n\nFull backs need the engine of a midfielder and the power of a defender.\n\n3 DAYS PER WEEK\n\nDay 1: Lower Body Power\n• Back squat 4x5\n• Hip thrust 4x8\n• Single leg press 3x10 each\n• Nordic curl 3x6\n• Calf raises 3x20\n\nDay 2: Endurance and Core\n• Aerobic intervals 20 mins\n• Core circuit — plank, dead bug, pallof press\n• Resistance band hip work 3x15\n• Balance and stability work 10 mins\n\nDay 3: Speed and Agility\n• Resisted sprints 8x20m\n• Lateral shuffle drills 6x10m\n• Box jumps 3x6\n• Agility ladder 10 mins\n• Hip flexor strengthening 3x12\n\nKEY FOCUS: Repeat sprint ability and hip flexor health are your top priorities. You sprint up and back more than any other outfield player.`,
+    'Defensive Mid':`GYM PLAN - DEFENSIVE MIDFIELDER\n\n3 DAYS PER WEEK\n\nDay 1: Strength\n• Trap bar deadlift 4x5\n• Back squat 3x6\n• Bulgarian split squat 3x8 each\n• Hip thrust 3x10\n• Nordic curl 3x6\n\nDay 2: Core and Anti-Rotation\n• Pallof press 4x12 each side\n• Cable rotations 3x12\n• Dead bug 3x10\n• Suitcase carry 3x20m each\n• Plank variations 3x45s\n\nDay 3: Aerobic and Power\n• Aerobic intervals 20 mins\n• Box jumps 3x6\n• Resisted sprints 6x20m\n• Agility work 10 mins\n\nKEY FOCUS: Core anti-rotation is critical for your position — you are constantly battling physical contact. Aerobic base to cover ground for 90 minutes. Strength to win physical duels.`,
+    'Central Mid':`GYM PLAN - CENTRAL MIDFIELDER\n\nThe engine room. You need strength, endurance and power in equal measure.\n\n3 DAYS PER WEEK\n\nDay 1: Strength\n• Back squat 4x5\n• Romanian deadlift 3x8\n• Single leg exercises 3x10 each\n• Upper body compound movements 3x8\n• Core circuit 3 rounds\n\nDay 2: Aerobic Development\n• 25 minute tempo run at 75% effort\n• Or 6x3 minute intervals at 85% with 90s rest\n• This is your most important session\n\nDay 3: Power and Speed\n• Trap bar deadlift 4x4\n• Box jumps 3x6\n• Resisted sprints 6x25m\n• Agility ladder 10 mins\n• Lateral movement drills 10 mins\n\nKEY FOCUS: Aerobic base is your number one quality. A central mid who can sustain high intensity for 90 minutes is worth more than a technically gifted one who fades.`,
+    'Attacking Mid':`GYM PLAN - ATTACKING MIDFIELDER\n\n3 DAYS PER WEEK\n\nDay 1: Lower Body Power\n• Back squat 4x5\n• Hip thrust 3x10\n• Single leg Romanian deadlift 3x8\n• Box jumps 3x6\n• Calf raises 3x20\n\nDay 2: Upper Body and Core\n• Bench press 3x8\n• Pull-ups 3x6\n• Rotational core work 4x12\n• Med ball throws 3x8\n• Anti-rotation exercises 3x12\n\nDay 3: Speed and Agility\n• Resisted sprints 6x20m\n• Direction change drills 10 mins\n• Agility ladder 10 mins\n• Plyometric circuit 3 rounds\n\nKEY FOCUS: Hip rotation power for shooting. Explosive acceleration for bursts into space. Core rotation for striking and turning. Agility to escape tight spaces.`,
+    'Winger':`GYM PLAN - WINGER\n\nYour game is built on speed and power. Train accordingly.\n\n3 DAYS PER WEEK\n\nDay 1: Sprint Mechanics and Power\n• Trap bar deadlift 4x4\n• Hip thrust 4x8\n• Resisted sprints 8x20m\n• Broad jumps 3x6\n• Single leg bounds 3x8 each\n\nDay 2: Upper Body and Core\n• Bench press 3x8\n• Pull-ups 3x6\n• Core circuit 3 rounds\n• Balance and stability work 10 mins\n• Hip flexor strengthening 3x12\n\nDay 3: Agility and Change of Direction\n• 5-10-5 shuttle drill 8x\n• Lateral bounds 3x8 each\n• Agility ladder 10 mins\n• Cone gate dribbling 10 mins\n• Ankle stability work 3x15\n\nKEY FOCUS: First step acceleration is your weapon. Hip flexor strength and ankle stability prevent the most common winger injuries. Agility to beat players in tight spaces.`,
+    'Striker':`GYM PLAN - STRIKER\n\nExplosive power and strength to hold the ball. These are your physical priorities.\n\n3 DAYS PER WEEK\n\nDay 1: Lower Body Explosion\n• Trap bar deadlift 4x4\n• Back squat 3x6\n• Hip thrust 4x8\n• Box jumps 4x5\n• Single leg press 3x10 each\n\nDay 2: Upper Body and Hold-Up Strength\n• Bench press 3x8\n• Weighted pull-ups 3x6\n• Farmers carry 3x30m\n• Shoulder press 3x8\n• Core circuit 3 rounds\n\nDay 3: Speed and Finishing\n• Resisted sprints 8x20m\n• Direction change drills 10 mins\n• Shooting under fatigue — sprint 25m then shoot x10\n• Plyometric circuit 3 rounds\n\nKEY FOCUS: Acceleration from standing is your most important quality. Hold-up strength to shield the ball. Finishing under fatigue — always end gym sessions with shooting.`,
+  },
+  nutrition:{
+    'Goalkeeper':`NUTRITION - GOALKEEPER\n\nDAILY STRUCTURE\nBreakfast: 3-4 eggs, toast, fruit\nMid-morning: Greek yoghurt and nuts\nLunch: Chicken or fish with rice and salad\nPre-training: Banana and rice cakes 90 mins before\nPost-training: Protein and carbs within 30 mins\nDinner: Lean protein, vegetables, complex carbs\n\nKEY NUTRIENTS FOR GOALKEEPERS\n• Calcium and Vitamin D — bone density for diving and contact\n• Protein — 1.6g per kg bodyweight daily for muscle maintenance\n• Omega 3 — reduces joint inflammation in wrists, knees and hips\n• Iron — supports reaction time and concentration\n\nHYDRATION\n• 2.5-3 litres daily\n• Even mild dehydration slows reaction time — critical for a goalkeeper\n• Drink 500ml in the 2 hours before every session\n\nPRE-MATCH\n• 3 hours before: Rice or pasta with lean protein\n• 1 hour before: Banana or energy gel\n• Avoid anything new on match day`,
+    'Centre Back':`NUTRITION - CENTRE BACK\n\nDAILY STRUCTURE\nBreakfast: Oats with protein, berries\nMid-morning: Handful of nuts and fruit\nLunch: Large portion of protein with complex carbs\nPre-training: Carb-based snack 90 mins before\nPost-training: Protein shake or food within 30 mins\nDinner: Lean protein, large salad or veg, moderate carbs\n\nKEY PRIORITIES\n• High protein for muscle mass and heading strength — 1.6-2g per kg\n• Calcium and Vitamin D for bone strength\n• Anti-inflammatory foods — oily fish, berries, turmeric\n• Iron for energy over 90 minutes\n\nAERIAL PERFORMANCE\n• Being well-hydrated improves concentration for aerial duels\n• Avoid heavy meals within 3 hours of kick-off\n• Carb load slightly the day before a big match\n\nSUPPLEMENTS TO CONSIDER\n• Omega 3 fish oil — joint and brain health\n• Vitamin D — especially important in Ireland October to April\n• Creatine — safe and effective for strength athletes`,
+    'Full Back':`NUTRITION - FULL BACK\n\nYou cover more ground than most — your nutrition needs to reflect that.\n\nDAILY STRUCTURE\nBreakfast: Oats, banana, eggs\nMid-morning: Rice cakes with peanut butter\nLunch: Pasta or rice with protein and veg\nPre-training: Banana and water 90 mins before\nPost-training: Chocolate milk or protein plus carbs immediately\nDinner: Lean protein, carbs, green vegetables\n\nKEY PRIORITIES\n• Carbohydrates are your main fuel — do not cut them\n• Eat enough — undereating limits your repeat sprint ability\n• Iron for energy — red meat twice a week or fortified cereals\n• Magnesium for muscle recovery — nuts, seeds, dark chocolate\n\nHYDRATION\n• 3 litres on training days — you sweat more than most positions\n• Electrolytes after very long or hot sessions\n\nMATCH DAY\n• 3 hours before: Pasta or rice meal\n• 1 hour before: Banana\n• Half time: Water and a gel or banana if needed`,
+    'Defensive Mid':`NUTRITION - DEFENSIVE MIDFIELDER\n\nYou are on the ball constantly and cover significant ground. Fuel it properly.\n\nDAILY STRUCTURE\nBreakfast: Porridge with protein\nMid-morning: Fruit and nuts\nLunch: Chicken or tuna pasta\nPre-training: Carb snack 90 mins before\nPost-training: Protein and carbs immediately\nDinner: Balanced plate — protein, carbs, lots of veg\n\nKEY PRIORITIES\n• Complex carbohydrates for sustained energy — avoid simple sugars before matches\n• High protein to maintain the muscle mass needed for physical duels\n• Anti-inflammatory diet — you take more physical contact than most\n• B vitamins for energy metabolism — wholegrains, eggs, leafy veg\n\nPHYSICAL DUEL RECOVERY\n• Protein within 30 mins of training\n• Omega 3 reduces muscle soreness from contact\n• Adequate sleep — 8 hours minimum for recovery\n\nALCOHOL: As a physically demanding position that depends on reading the game, cognitive function matters. Alcohol impacts decision-making speed for up to 48 hours.`,
+    'Central Mid':`NUTRITION - CENTRAL MIDFIELDER\n\nThe most physically demanding outfield position. Nutrition is not optional — it is performance.\n\nDAILY STRUCTURE\nBreakfast: Large bowl of oats, banana, 2 eggs\nMid-morning: Greek yoghurt and fruit\nLunch: Large chicken or tuna pasta with salad\nPre-training: Rice cakes and banana 90 mins before\nPost-training: Protein shake plus banana immediately\nDinner: Lean protein 150-200g, large portion of rice or potato, green veg\n\nKEY PRIORITIES\n• Carbohydrates are critical — you cover 10-13km per match\n• Do not skip breakfast on training days\n• Stay hydrated all day — not just around training\n• Protein at every meal to maintain muscle mass\n\nAEROBIC PERFORMANCE NUTRITION\n• Carb loading the night before a big match\n• Beetroot juice 2-3 hours before — proven to improve endurance performance\n• Caffeine 60 mins before match if you use it — proven performance enhancer\n\nRECOVERY\n• Chocolate milk within 20 mins of final whistle — perfect recovery ratio\n• Anti-inflammatory meal that evening — salmon, sweet potato, greens`,
+    'Attacking Mid':`NUTRITION - ATTACKING MIDFIELDER\n\nCreativity needs a fuelled brain as much as a fuelled body.\n\nDAILY STRUCTURE\nBreakfast: Eggs on wholegrain toast, fruit\nMid-morning: Nuts and dark chocolate (yes, it counts)\nLunch: Lean protein with complex carbs and salad\nPre-training: Banana and water\nPost-training: Protein and carbs within 30 mins\nDinner: Balanced meal — avoid heavy fat before a morning session\n\nKEY PRIORITIES\n• Brain fuel — omega 3, blueberries and dark chocolate support cognitive performance\n• Carbs for explosive bursts — your game relies on sharp acceleration\n• Avoid blood sugar spikes before matches — complex carbs only\n• Hydration impacts decision-making speed — stay on top of it\n\nCREATIVITY AND FOCUS\n• Magnesium supports brain function — dark chocolate, nuts, seeds\n• Avoid heavy meals before training — a full stomach slows movement\n• Caffeine can sharpen focus but time it right — 60 mins before kick-off\n\nGOAL: Eat to think fast and move fast. Your position demands both.`,
+    'Winger':`NUTRITION - WINGER\n\nExplosive speed needs explosive fuel.\n\nDAILY STRUCTURE\nBreakfast: Oats with berries and protein\nMid-morning: Banana and peanut butter\nLunch: Rice with chicken and salad\nPre-training: Fast-digesting carbs 60-90 mins before — banana, energy bar\nPost-training: Protein and carbs immediately\nDinner: Lean protein, complex carbs, green veg\n\nKEY PRIORITIES\n• Carbohydrates fuel explosive sprints — eat plenty\n• Creatine supplementation — evidence-backed for sprint sports\n• Iron for repeated sprint efforts — dark leafy veg, red meat\n• Lightweight eating on match day — nothing heavy or unfamiliar\n\nSPRINT PERFORMANCE\n• Caffeine 60 mins before match — proven to increase sprint speed\n• Beetroot juice 2 hours before — improves oxygen efficiency\n• Stay light before kick-off — a heavy stomach kills sprint speed\n\nHYDRATION\n• Dehydration reduces sprint speed significantly\n• Weigh yourself before and after training — replace every kg lost with 1.5 litres of water`,
+    'Striker':`NUTRITION - STRIKER\n\nYou need to be sharp, explosive and composed in front of goal. Feed that.\n\nDAILY STRUCTURE\nBreakfast: 3-4 eggs, wholegrain toast, juice\nMid-morning: Fruit and Greek yoghurt\nLunch: Large protein meal — chicken, rice, salad\nPre-training: Banana 60-90 mins before\nPost-training: Protein shake or food immediately\nDinner: Lean protein, sweet potato or rice, vegetables\n\nKEY PRIORITIES\n• Explosive power needs carbohydrates — do not cut carbs\n• High protein for muscle strength and hold-up play — 1.6-2g per kg\n• Iron for energy and sprint capacity\n• Brain fuel for composure in front of goal — omega 3, hydration\n\nFINISHING PERFORMANCE\n• Hydration affects composure and accuracy — stay on top of it\n• Avoid blood sugar crashes — eat regularly throughout match day\n• Pre-match meal 3 hours before — pasta or rice with chicken\n\nMENTAL EDGE\n• Caffeine 60 mins before — sharpens focus and reaction time\n• Light breakfast on match day morning if you have an evening game`,
+  },
+  recovery:{
+    'Goalkeeper':`RECOVERY - GOALKEEPER\n\nSLEEP\n• 8-9 hours is non-negotiable\n• Sleep is when your nervous system recovers — critical for reaction time\n• Consistent bed and wake times improve sleep quality\n\nIMMEDIATE POST-MATCH\n• Protein and carbs within 30 minutes\n• Light walk or cycle for 10 minutes to flush lactic acid\n• Cold shower if available\n\nDAY AFTER MATCH\n• Foam roll: IT band, quads, calves, thoracic spine — 10 mins\n• Light swim or walk for 20-30 mins\n• Anti-inflammatory meal — salmon, sweet potato, greens, berries\n• Avoid intense training 24 hours post-match\n\nWEEKLY RECOVERY HABITS\n• Two full rest days minimum\n• Regular sports massage if possible — wrists, shoulders and hips for GKs\n• Contrast showers — hot/cold alternating — reduce muscle soreness\n• Hydrate consistently throughout the week, not just around training`,
+    'Centre Back':`RECOVERY - CENTRE BACK\n\nSLEEP\n• 8-9 hours. Physical battles in matches take a toll — your body needs time to repair\n• Poor sleep impairs aerial timing and reaction speed\n\nIMMEDIATE POST-MATCH\n• Protein and carbs within 30 minutes\n• Ice any contact areas if bruised or swollen\n• Light mobility work 10 mins\n\nDAY AFTER MATCH\n• Foam roll thoroughly — quads, hamstrings, glutes, lower back\n• Light jog 20 mins to flush the legs\n• Anti-inflammatory nutrition — oily fish, turmeric, berries\n\nINJURY PREVENTION HABITS\n• Nordic hamstring curls twice a week — prevents the most common CB injury\n• Hip flexor stretching daily — tight hip flexors cause back problems\n• Ankle and knee mobility work after every session\n\nMENTAL RECOVERY\n• Review your match positionally — identify one thing to improve\n• Do not replay mistakes — identify them, learn, move on`,
+    'Full Back':`RECOVERY - FULL BACK\n\nYou run more than almost any other player. Recovery is not optional.\n\nSLEEP\n• 8-9 hours. Repeat sprint ability drops significantly with poor sleep\n\nIMMEDIATE POST-MATCH\n• Protein and carbs immediately\n• Elevate legs for 15 mins — helps flush blood from tired legs\n• Light stretching — hip flexors, quads, calves\n\nDAY AFTER MATCH\n• Full rest or gentle walk only\n• Foam roll hip flexors, IT band, calves\n• Anti-inflammatory meal\n• Compression tights if available — help with leg recovery\n\nWEEKLY HABITS\n• Hip flexor stretching daily — full backs are most prone to hip flexor strains\n• Calf raises and ankle work to prevent ankle injuries from repetitive sprinting\n• Hydrate consistently — repeat sprint ability is the first thing to drop when dehydrated`,
+    'Defensive Mid':`RECOVERY - DEFENSIVE MIDFIELDER\n\nSLEEP\n• 8-9 hours. You process more decisions per match than most — cognitive recovery matters\n\nIMMEDIATE POST-MATCH\n• Protein and carbs within 30 minutes\n• Light movement 10 mins to cool down\n• Ice any contact bruising\n\nDAY AFTER MATCH\n• Light recovery session — walk, swim or cycle 20-30 mins\n• Full body foam roll\n• Anti-inflammatory nutrition\n\nINJURY PREVENTION\n• Hamstring and groin work — highest injury risk areas for defensive mids\n• Nordic curls twice a week\n• Adductor strengthening — lateral movements under fatigue cause groin injuries\n\nMENTAL RECOVERY\n• Review your positioning from the match\n• Identify the moments you were out of position and why\n• Rest your brain too — do not watch football every night`,
+    'Central Mid':`RECOVERY - CENTRAL MIDFIELDER\n\nYou cover the most ground on the pitch. Your recovery needs to match that output.\n\nSLEEP\n• 9 hours target. Non-negotiable for a high-mileage position\n\nIMMEDIATE POST-MATCH\n• Chocolate milk or protein and carbs within 20 minutes\n• Light jog 5-10 mins to cool down\n• Full body stretch 15 mins\n\nDAY AFTER MATCH\n• Active recovery — 20-30 min light jog or swim\n• Full body foam roll — quads, hamstrings, IT band, glutes, upper back\n• Anti-inflammatory meal — salmon, sweet potato, greens\n\nWEEKLY HABITS\n• Two days completely off intense training per week\n• Regular sports massage if budget allows\n• Consistent hydration all week — not just around training days\n• Monitor your resting heart rate — a raised resting HR means you need more rest`,
+    'Attacking Mid':`RECOVERY - ATTACKING MIDFIELDER\n\nSLEEP\n• 8-9 hours. Creativity and decision-making suffer most with poor sleep\n\nIMMEDIATE POST-MATCH\n• Protein and carbs within 30 minutes\n• Light stretch focusing on hips and lower back\n\nDAY AFTER MATCH\n• Rest or very light activity\n• Foam roll — hip flexors, quads, hamstrings\n• Anti-inflammatory nutrition\n\nINJURY PREVENTION\n• Hip flexor stretching daily — attacking mids make explosive turns constantly\n• Ankle stability work — cutting and turning movements stress ankles\n• Hamstring eccentric work — Nordic curls\n\nMENTAL RECOVERY\n• Attacking mids often carry misses mentally — develop a short memory\n• Review the good moments from the match before you review the bad\n• Do something completely unrelated to football on your full rest day`,
+    'Winger':`RECOVERY - WINGER\n\nYour legs take a serious pounding from repeated sprinting. Prioritise recovery.\n\nSLEEP\n• 9 hours if possible. Sprint performance drops dramatically with under-sleeping\n\nIMMEDIATE POST-MATCH\n• Protein and carbs immediately\n• Cold water immersion if available — proven to reduce sprint fatigue\n• Elevate legs 15 mins\n\nDAY AFTER MATCH\n• Full rest — no sprinting or intense work\n• Foam roll: quads, IT band, hip flexors, calves — 15 mins minimum\n• Anti-inflammatory meal\n• Compression tights — help flush leg fatigue\n\nINJURY PREVENTION\n• Hip flexor stretching daily — the most common winger injury\n• Calf and Achilles work — heavy sprint loads stress the Achilles tendon\n• Ankle stability exercises — cutting and crossing stress ankle ligaments\n• Nordic curls twice a week — hamstring injury prevention`,
+    'Striker':`RECOVERY - STRIKER\n\nSLEEP\n• 8-9 hours. Composure and finishing precision improve significantly with proper sleep\n\nIMMEDIATE POST-MATCH\n• Protein and carbs within 30 minutes\n• Light movement to cool down\n• Mental reset — forget the misses immediately\n\nDAY AFTER MATCH\n• Rest or very light technical work only\n• Foam roll — quads, hip flexors, calves, glutes\n• Anti-inflammatory meal\n\nINJURY PREVENTION\n• Hip flexor health is critical — explosive acceleration destroys tight hip flexors\n• Hamstring eccentric work — strikers are high hamstring injury risk\n• Ankle stability — planting and shooting under pressure stresses ankles\n• Groin work — lateral movements and shots stress adductors\n\nMENTAL RECOVERY\n• Strikers are judged on goals — but a striker who worries about misses misses more\n• Develop a pre-match ritual that resets your confidence every game\n• Review your movement and runs, not just your finishing`,
+  },
+  weekly:{
+    'Goalkeeper':`WEEKLY PLAN - GOALKEEPER\n\nMONDAY\nGym — Explosive power session\nTrap bar deadlift, box jumps, lateral bounds, hip thrust\n\nTUESDAY\nGK Technical — 60 mins\nShot-stopping, distribution, cross claiming, footwork patterns\n\nWEDNESDAY\nActive recovery — light swim or walk 30 mins\nFoam roll and stretch 15 mins\n\nTHURSDAY\nTeam training — full session\nCommunication, set piece organisation, press triggers\n\nFRIDAY\nActivation — 20 mins\nLight footwork, handling, mental preparation\n\nSATURDAY\nMatch — full focus and communication\n\nSUNDAY\nFull rest. Foam roll, eat well, sleep 9 hours\n\nWEEKLY GOAL: One specific technical improvement each week. Write it down before Monday, review it on Sunday.`,
+    'Centre Back':`WEEKLY PLAN - CENTRE BACK\n\nMONDAY\nGym — Strength session\nBack squat, Romanian deadlift, hip thrust, Nordic curl\n\nTUESDAY\nTechnical — 45 mins\nPassing from the back, aerial work, 1v1 defending patterns\n\nWEDNESDAY\nGym — Upper body and aerial\nPull-ups, rows, neck work, core circuit\n\nTHURSDAY\nTeam training — full session\nDeep focus on defensive shape and communication\n\nFRIDAY\nLight activation — 20 mins\nMobility, set piece positioning, mental preparation\n\nSATURDAY\nMatch — lead by example, communicate constantly\n\nSUNDAY\nFull rest. Foam roll, anti-inflammatory meal, 9 hours sleep\n\nWEEKLY GOAL: Identify one aerial situation and one passing situation to improve. Work on them specifically Tuesday.`,
+    'Full Back':`WEEKLY PLAN - FULL BACK\n\nMONDAY\nGym — Lower body power\nSquats, hip thrust, single leg work, Nordic curls\n\nTUESDAY\nTechnical — 45 mins\nCrossing from both sides, overlapping runs, 1v1 defending\n\nWEDNESDAY\nAerobic session — 25 mins tempo run\nThis is your most important fitness session\n\nTHURSDAY\nTeam training — full intensity\n\nFRIDAY\nSpeed activation — 20 mins\nShort sprints, hip flexor work, light technical\n\nSATURDAY\nMatch — get forward and get back. Work rate wins games\n\nSUNDAY\nFull rest. Foam roll hip flexors, eat well, sleep\n\nWEEKLY PRIORITY: Your crossing quality. Ten crosses from the byline and ten cutbacks on Tuesday. Both feet.`,
+    'Defensive Mid':`WEEKLY PLAN - DEFENSIVE MIDFIELDER\n\nMONDAY\nGym — Full strength session\nDeadlift, squat, core anti-rotation work\n\nTUESDAY\nTechnical — 45 mins\nPressing triggers, receiving under pressure, switching play\n\nWEDNESDAY\nAerobic session — intervals 6x3 mins at high intensity\n\nTHURSDAY\nTeam training — organise the press from the front\n\nFRIDAY\nLight technical and mental prep — 20 mins\nPassage of play patterns, set piece organisation\n\nSATURDAY\nMatch — sit, screen, press on trigger, distribute simply\n\nSUNDAY\nFull rest. Study one passage of play from yesterday's match\n\nWEEKLY PRIORITY: Your positioning. Before every ball is played in training, check your position. Make it a habit.`,
+    'Central Mid':`WEEKLY PLAN - CENTRAL MIDFIELDER\n\nMONDAY\nGym — Strength and power\nDeadlift, squat, plyometrics, core\n\nTUESDAY\nTechnical — 60 mins\nReceiving on the half-turn, combination play, shooting\n\nWEDNESDAY\nAerobic development — 25-30 min tempo run\nThis is your most important session of the week\n\nTHURSDAY\nTeam training — be the organiser\n\nFRIDAY\nActivation — 25 mins\nLight technical, agility, mental preparation\n\nSATURDAY\nMatch — work both ways, get on the ball constantly\n\nSUNDAY\nFull rest. Eat well, hydrate, sleep 9 hours\n\nWEEKLY PRIORITY: Your first touch. Every Tuesday session starts with 15 minutes of receiving under light pressure on the half turn.`,
+    'Attacking Mid':`WEEKLY PLAN - ATTACKING MIDFIELDER\n\nMONDAY\nGym — Lower body power and shooting mechanics\nSquat, hip thrust, box jumps, rotational core\n\nTUESDAY\nTechnical — 60 mins\nReceiving between the lines, turning, shooting, combination play\n\nWEDNESDAY\nRecovery and creativity\nLight technical — free play, try new things, enjoy the ball\n\nTHURSDAY\nTeam training — find pockets, link play, arrive late in the box\n\nFRIDAY\nActivation — 20 mins\nTouch work, shooting, mental visualisation\n\nSATURDAY\nMatch — take risks, be creative, back yourself\n\nSUNDAY\nFull rest. Watch football for enjoyment and ideas\n\nWEEKLY PRIORITY: Your weak foot finishing. 10 shots with weak foot every Tuesday and Thursday. No exceptions.`,
+    'Winger':`WEEKLY PLAN - WINGER\n\nMONDAY\nGym — Sprint mechanics and lower body power\nTrap bar deadlift, hip thrust, resisted sprints, bounds\n\nTUESDAY\nTechnical — 60 mins\n1v1 moves, crossing quality, weak foot development\n\nWEDNESDAY\nRecovery and speed work\nLight jog, foam roll, 4x short acceleration sprints only\n\nTHURSDAY\nTeam training — express yourself, take players on\n\nFRIDAY\nActivation — 20 mins\nSpeed drills, touch work, hip flexor activation\n\nSATURDAY\nMatch — take your defender on every chance you get\n\nSUNDAY\nFull rest. Foam roll hip flexors and calves. Sleep 9 hours\n\nWEEKLY PRIORITY: Your weaker side. Every Tuesday, spend 20 minutes specifically developing your crossing and running from the opposite flank.`,
+    'Striker':`WEEKLY PLAN - STRIKER\n\nMONDAY\nGym — Explosive lower body\nTrap bar deadlift, back squat, box jumps, hip thrust\n\nTUESDAY\nTechnical — 60 mins\nFinishing from all angles, movement patterns, hold-up play\n\nWEDNESDAY\nRecovery and touch work\nLight jog, foam roll, ball work only — juggling and control\n\nTHURSDAY\nTeam training — make runs even when you know the ball will not come\n\nFRIDAY\nActivation — 20 mins\nShooting warm-up, sprint activation, mental preparation\n\nSATURDAY\nMatch — work for the team, stay sharp, take your chance when it comes\n\nSUNDAY\nFull rest. Eat well, hydrate, sleep 9 hours\n\nWEEKLY RULE: Every training session ends with finishing under fatigue. Sprint 20m then shoot. Always. Build the habit now.`,
+  }
+};
+
+/* ===== AI COACH ===== */
+function renderAI(){
+  const pl=state.players.find(x=>x.id===state.selectedPlayer)||state.players[0];
+  const currentAdvice = state.currentAdvice||null;
+  const currentType = state.currentAdviceType||null;
+  return`<div class="section-title">Player Advice</div>
+  <div class="section-sub">Personalised plans by position</div>
+  <div class="tab-pills">${state.players.map(p=>`<button class="tab-pill${p.id===state.selectedPlayer?' active':''}" onclick="setAIPlayer(${p.id})">${p.name.split(' ')[0]}</button>`).join('')}</div>
+  ${pl?`<div class="card" style="margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="avatar av-${posClass(pl.pos)}" style="width:36px;height:36px;font-size:12px;margin-bottom:0">${initials(pl.name)}</div>
+      <div><div style="font-weight:600;font-size:14px">${pl.name}</div><div style="font-size:11px;color:var(--muted)">${pl.pos} · ${pl.age}yrs · Goal: ${pl.goals||'Not set'}</div></div>
+    </div>
+  </div>`:''}
+  <div class="quick-grid">
+    <button class="btn btn-sm${currentType==='gym'?' btn-accent':''}" onclick="showCoachAdvice('gym')" style="justify-content:center"><i class="ti ti-barbell"></i>Gym Plan</button>
+    <button class="btn btn-sm${currentType==='nutrition'?' btn-accent':''}" onclick="showCoachAdvice('nutrition')" style="justify-content:center"><i class="ti ti-apple"></i>Nutrition</button>
+    <button class="btn btn-sm${currentType==='recovery'?' btn-accent':''}" onclick="showCoachAdvice('recovery')" style="justify-content:center"><i class="ti ti-heart-rate-monitor"></i>Recovery</button>
+    <button class="btn btn-sm${currentType==='weekly'?' btn-accent':''}" onclick="showCoachAdvice('weekly')" style="justify-content:center"><i class="ti ti-calendar"></i>Weekly Plan</button>
+  </div>
+  ${currentAdvice?`<div>
+    <div class="ai-label"><i class="ti ti-robot" style="font-size:13px;color:var(--accent)"></i>${pl?pl.name+' — ':''} ${currentType==='gym'?'Gym Plan':currentType==='nutrition'?'Nutrition Plan':currentType==='recovery'?'Recovery Plan':'Weekly Plan'}</div>
+    <div class="ai-bubble">${currentAdvice.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</div>
+  </div>`:`<div class="empty-state" style="padding:20px"><i class="ti ti-robot" style="font-size:32px;display:block;margin-bottom:8px"></i>Select a player tab above then tap a plan button to get position-specific advice.</div>`}`;
+}
+
+function showCoachAdvice(type){
+  const pl=state.players.find(x=>x.id===state.selectedPlayer)||state.players[0];
+  if(!pl)return;
+  const pos=pl.pos||'Striker';
+  const advice=COACH_ADVICE[type]?.[pos]||COACH_ADVICE[type]?.['Striker']||'No advice available for this position.';
+  state.currentAdvice=advice;
+  state.currentAdviceType=type;
+  render();
+  setTimeout(()=>{const el=document.querySelector('.ai-bubble');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},100);
+}
+
+function setAIPlayer(id){state.selectedPlayer=id;state.currentAdvice=null;state.currentAdviceType=null;render();}
+function attachHandlers(){}
+
+render();
+</script>
+</body>
+</html>
+<script>
+if('serviceWorker' in navigator){
+  const swCode=`
+const CACHE='cm-v1';
+const ASSETS=[
+  'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css',
+  'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/fonts/tabler-icons.woff2'
+];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS).catch(()=>{})));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok&&e.request.url.startsWith('https://cdn.jsdelivr.net')){const clone=res.clone();caches.open(CACHE).then(c=>c.put(e.request,clone));}return res;}).catch(()=>caches.match(e.request))));});
+`;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  const swUrl=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+</script>
